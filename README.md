@@ -26,3 +26,13 @@ make destroy
 - `n8n-hello/` - AKS cluster + managed Postgres via Terraform; n8n deployed with
   hand-written Kubernetes manifests (no Helm chart), reverse-engineered from
   n8n's Docker install docs.
+
+## New project helper
+
+```bash
+make new-project
+```
+
+Prompts for a name, copies `n8n-hello/` into a new folder as a starting template
+(skips `.env`, `.terraform/`, `.terraform.lock.hcl`, `terraform.tfstate*`). Edit
+the copied `main.tf`/`README.md` and fill in a fresh `.env` from there.
