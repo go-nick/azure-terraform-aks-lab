@@ -154,3 +154,10 @@ resource "kubectl_manifest" "n8n_pod" {
   ]
 }
 
+resource "kubectl_manifest" "n8n_service" {
+  yaml_body = file("${path.module}/manifests/service.yaml")
+
+  depends_on = [
+    kubectl_manifest.n8n_pod,
+  ]
+}
