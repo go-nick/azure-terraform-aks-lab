@@ -141,7 +141,7 @@ resource "kubectl_manifest" "n8n_configmap" {
 }
 
 resource "kubectl_manifest" "n8n_pvc" {
-  yaml_body = file("${path.module}/manifests/persistentvolume.yaml")
+  yaml_body = file("${path.module}/manifests/storage.yaml")
 }
 
 resource "kubectl_manifest" "n8n_pod" {
