@@ -74,6 +74,39 @@ Key things this diagram is making explicit:
   that mount is what triggers the fetch. No mount, no synced `Secret`, no
   `envFrom` values.
 
+## Inspecting the secret at each stage
+
+Commands matching each node in the diagram above - run top to bottom to see
+the value transform from vault secret to running env var.
+
+**The `SecretProviderClass` object itself:**
+```bash
+kubectl get secretproviderclass -n n8n
+kubectl describe secretproviderclass n8n-secrets -n n8n
+```
+
+**The synced Kubernetes `Secret` (created by the CSI driver, not Terraform):**
+```bash
+kubectl get secret -n n8n
+kubectl get secret n8n-container-env -n n8n -o yaml   # values are base64, not plaintext
+```
+
+**Decode an actual value** (careful - this prints the real secret to your terminal):
+```bash
+kubectl get secret n8n-container-env -n n8n -o jsonpath='{.data.DB_POSTGRESDB_USER}' | base64 -d
+```
+
+**The file-mount side** - same value, written as a plain file inside the pod:
+```bash
+kubectl exec -n n8n deploy/n8n -- ls -la /mnt/secrets-store
+kubectl exec -n n8n deploy/n8n -- cat /mnt/secrets-store/db-user
+```
+
+**Confirm it actually landed as an env var in the running container:**
+```bash
+kubectl exec -n n8n deploy/n8n -- env | grep DB_POSTGRESDB
+```
+
 ## n8n (Kubernetes manifests)
 
 ```bash
