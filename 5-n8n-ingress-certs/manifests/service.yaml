@@ -13,4 +13,4 @@ spec:
     targetPort: n8n-port
   selector:
     app: n8n
-  type: LoadBalancer
+  type: ClusterIP

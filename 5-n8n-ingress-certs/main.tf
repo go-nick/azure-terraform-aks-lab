@@ -273,13 +273,11 @@ resource "kubectl_manifest" "n8n_service" {
 
 
 resource "helm_release" "traefik" {
-  name       = "traefik"
-  repository = "https://traefik.github.io/charts"
-  chart      = "traefik"
-  namespace  = "traefik"
-  depends_on = [
-    kubectl_manifest.n8n_service,
-  ]
+  name             = "traefik"
+  repository       = "https://traefik.github.io/charts"
+  chart            = "traefik"
+  namespace        = "traefik"
+  create_namespace = true
 }
 
 resource "helm_release" "cert_manager" {
@@ -294,9 +292,6 @@ resource "helm_release" "cert_manager" {
     name  = "crds.enabled"
     value = "true"
   }
-  depends_on = [
-    helm_release.traefik,
-  ]
 }
 
 data "kubectl_file_documents" "cluster_issuer" {
@@ -319,7 +314,9 @@ resource "kubectl_manifest" "n8n_ingress" {
   yaml_body = file("${path.module}/manifests/ingress.yaml")
 
   depends_on = [
+    helm_release.traefik,
     kubectl_manifest.n8n_cluster_issuer,
+    kubectl_manifest.n8n_service,
   ]
 }
 # ________________________________________________________________________________
