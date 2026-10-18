@@ -4,14 +4,14 @@ metadata:
   name: n8n-ingress
   namespace: n8n
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-staging
-    #cert-manager.io/cluster-issuer: letsencrypt-prod
+    #cert-manager.io/cluster-issuer: letsencrypt-staging
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: traefik
   tls:
     - hosts:
         - aks.n8n.nicklab.org
-      secretName: n8n-tls-staging
+      secretName: n8n-tls-prod
   rules:
     - host: aks.n8n.nicklab.org
       http:
