@@ -51,6 +51,11 @@ variable "db_user" {
   sensitive = true
 }
 
+variable "acme_email" {
+  type = string 
+  sensitive = true 
+}
+
 # ____________________________________________________________________________________________
 # AZURE
 #
@@ -295,7 +300,9 @@ resource "helm_release" "cert_manager" {
 }
 
 data "kubectl_file_documents" "cluster_issuer" {
-  content = file("${path.module}/manifests/cluster-issuer.yaml")
+  content = templatefile("${path.module}/manifests/cluster-issuer.yaml.tpl", {
+    acme_email = var.acme_email
+  })
 }
 
 resource "kubectl_manifest" "n8n_cluster_issuer" {
