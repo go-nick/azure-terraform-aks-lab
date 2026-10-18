@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: n8n-ingress
+  namespace: n8n
+  annotations:
+    #cert-manager.io/cluster-issuer: letsencrypt-staging
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - aks.n8n.nicklab.org
+      secretName: n8n-tls-prod
+  rules:
+    - host: aks.n8n.nicklab.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: n8n-loadbalancer # Your n8n service name
+                port:
+                  number: 5678 # Or whatever port your n8n service exposes

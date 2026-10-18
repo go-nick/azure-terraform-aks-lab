@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: n8n
+  name: n8n
+  namespace: n8n
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: n8n
+  template:
+    metadata:
+      labels:
+        app: n8n
+    spec:
+      volumes:
+        - name: n8n-data
+          persistentVolumeClaim:
+            claimName: n8n-claim
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: n8n-secrets
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+        runAsNonRoot: true
+      restartPolicy: Always
+      containers:
+        - name: n8n
+          image: n8nio/n8n:latest
+          securityContext:
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - mountPath: /home/node/.n8n
+              name: n8n-data
+            - mountPath: /mnt/secrets-store
+              name: secrets-store
+              readOnly: true
+          ports:
+            - name: n8n-port
+              containerPort: 5678
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: config
+            - secretRef:
+                name: n8n-container-env
+
